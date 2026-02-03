@@ -1,0 +1,12 @@
+ [HttpPost]
+        public string DeleteUpdateStudent(StudentEntity oEntity)
+        {
+            oEntity.CreatedUserID_ = SessionHandler.LoginID;
+            oEntity.SessionID = Convert.ToInt32(SessionHandler.SessionID);
+            oEntity.SchoolID = Convert.ToInt32(SessionHandler.SchoolID);
+            oEntity.StudentID = oEntity.DeleteUpdateID;
+            oEntity.Operation = Convert.ToInt32(new StudentDAL().AddUpdateDeleteStudent(oEntity).Tables[0].Rows[0][0]);
+            if (oEntity.Operation == 4) ViewBag.message = MessageEntity.ActiveMessage;
+            else if (oEntity.Operation == 3) ViewBag.message = MessageEntity.DeleteMessage;
+            return ViewBag.message;
+        }
