@@ -1,0 +1,218 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.ComponentModel.DataAnnotations;
+using System.Web;
+
+namespace Entity
+{
+    public class StudentEntity : CommonEntity
+    { 
+        public int StudentID { get; set; }
+
+        [Display(Name = "Name")]
+        [Required(ErrorMessage = "*")]
+        [RegularExpression("^[a-zA-Z0-9. ]*$", ErrorMessage = "Special Characters not allowed")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "First Name should be less than 50 Characters")]
+        public string FirstName { get; set; } 
+
+        [Display(Name = "Last Name")] 
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Last Name should be less than 50 Characters")]
+        public string LastName { get; set; }
+
+        [Display(Name = "Admission Number")] 
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Admission Number should be less than 50 Characters")] 
+        public string AdmissionNo { get; set; }
+
+        [Display(Name = "Date of Birth")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [DateRange("01/01/1900", "31/12/2100")]
+        public string DateofBirth { get; set; }
+
+        [Display(Name = "Mobile Number")]
+        [Required(ErrorMessage = "*")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "This is not a Valid Number")]
+        [StringLength(10, MinimumLength = 10)]
+        public string MobileNo { get; set; }
+
+        [Display(Name = "Email")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Email ID should be less than 50")]
+        [RegularExpression(@"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$", ErrorMessage = "Please enter a valid e-mail adress")]
+        public string EmailID { get; set; } 
+
+        [Display(Name = "Admission Date")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [DateRange("01/01/1900", "31/12/2100")]
+        public string AdmissionDate { get; set; } 
+
+        [Display(Name = "Father Name")]
+        [Required(ErrorMessage = "*")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Father Name should be less than 50 Characters")]
+        public string FatherName { get; set; }
+
+        [Display(Name = "Mother Name")]
+        [Required(ErrorMessage = "*")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Father Name should be less than 50 Characters")]
+        public string MotherName { get; set; }
+
+        [Display(Name = "Gender")]
+        [Required(ErrorMessage = "*")]
+        [StringLength(10, MinimumLength = 1, ErrorMessage = "Gender should be less than 10 Characters")]
+        public string Gender { get; set; } 
+
+        [Display(Name = "Nationality")]
+        [StringLength(20, MinimumLength = 1, ErrorMessage = "Nationality should be less than 20 Characters")]
+        public string Nationality { get; set; } 
+
+        [Display(Name = "Student Category")]
+        public int? StudentCategoryID { get; set; }
+        public string StudentCategoryName { get; set; }
+
+        [Display(Name = "Admission Session")]
+        public int? AdmissionSessionID { get; set; }
+        public string AdmissionSessionName { get; set; }
+
+        [Display(Name = "Roll No")]
+        [Required(ErrorMessage = "*")]
+        [StringLength(10, MinimumLength = 1, ErrorMessage = "Roll No should be less than 10 Characters")]
+        public string RollNo { get; set; }
+
+        [Display(Name = "UDISE No")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "UDISE No should be less than 50 Characters")]
+        public string UDISENo { get; set; } 
+        public decimal PrevFee { get; set; }
+
+        [Display(Name = "Board Roll No")]
+        [StringLength(25, MinimumLength = 1, ErrorMessage = "Board Roll No should be less than 25 Characters")]
+        public string BoardRollNo { get; set; } 
+
+        [Display(Name = "Class & Section")]
+        [Required(ErrorMessage = "*")]
+        public int ClassSectionID { get; set; }
+        public string ClassSectionName { get; set; }  
+
+        [Display(Name = "Concession")] 
+        public int? ConcessionID { get; set; }
+        public string ConcessionName { get; set; }
+
+        [Display(Name = "Address (Part I)")]
+        [Required(ErrorMessage = "*")]
+        [StringLength(250, MinimumLength = 1, ErrorMessage = "Address (Part I) should be less than 250 Characters")]
+        public string Address1 { get; set; } 
+
+        [Display(Name = "Address (Part II)")]
+        [StringLength(250, MinimumLength = 1, ErrorMessage = "Address (Part II) should be less than 250 Characters")]
+        public string Address2 { get; set; }
+
+        [Display(Name = "City")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "City should be less than 50 Characters")]
+        public string CityName { get; set; } 
+
+        [Display(Name = "State")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "State should be less than 50 Characters")]
+        public string StateName { get; set; }
+
+        [Display(Name = "Pin Code")] 
+        public string Pincode { get; set; } 
+
+        [Display(Name = "Father Mobile No")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "This is not a Valid Number")]
+        [StringLength(10, MinimumLength = 10)] 
+        public string FatherMobileNo { get; set; } 
+
+        [Display(Name = "Mother Mobile No")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "This is not a Valid Number")]
+        [StringLength(10, MinimumLength = 10)]
+        public string MotherMobileNo { get; set; } 
+
+        [Display(Name = "Guardian Mobile No")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "This is not a Valid Number")]
+        [StringLength(10, MinimumLength = 10)]
+        public string GuardianMobileNo { get; set; } 
+
+        [Display(Name = "Emergency Contact No")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "This is not a Valid Number")]
+        [StringLength(10, MinimumLength = 10)]
+        public string EmergencyContactNo { get; set; } 
+
+        [Display(Name = "Father Aadhar Card No")]  
+        public string FatherAadharCardNo { get; set; } 
+
+        [Display(Name = "Mother Aadhar Card No")] 
+        public string MotherAadharCardNo { get; set; } 
+
+        [Display(Name = "Aadhar Card No")] 
+        public string AadharCardNo { get; set; }
+
+        [Display(Name = "Guardian Name")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Guardian Name should be less than 50 Characters")]
+        public string GuardianName { get; set; }
+
+        [Display(Name = "Emergency Contact Name")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "Emergency Contact Name should be less than 50 Characters")]
+        public string EmergencyContactName { get; set; } 
+
+        [Display(Name = "Date of Check up")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [DateRange("01/01/1900", "31/12/2100")]
+        public string DateofCheckup { get; set; } 
+
+        [Display(Name = "Blood Group")] 
+        public string BloodGroup { get; set; }
+
+        [Display(Name = "Eye Sight")]
+        public string EyeSight { get; set; }
+
+        [Display(Name = "Height")]
+        public string Height { get; set; }
+
+        [Display(Name = "Weight")]
+        public string Weight { get; set; }
+
+        [Display(Name = "Is Handicap")]
+        public bool IsHandiCap { get; set; }
+
+        [Display(Name = "Handicap Details")]
+        [StringLength(250, MinimumLength = 1, ErrorMessage = "Handicap Details should be less than 250 Characters")]
+        public string HandiCapDetails { get; set; } 
+
+        [Display(Name = "Next Date of Check up")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
+        [DateRange("01/01/1900", "31/12/2100")]
+        public string NextDateofCheckup { get; set; } 
+        public string ImageURL { get; set; }
+
+        [SingleFileSize(4 * 1024 * 1024, ErrorMessage = "File size should be within 4 MB")]
+        [FileTypes("jpg,jpeg,png,gif", ErrorMessage = "File Type is invalid")]
+        [Display(Name = "Student Image")]
+        public HttpPostedFileBase[] flImageURL { get; set; } 
+        public string FatherImageURL { get; set; }
+
+        [SingleFileSize(4 * 1024 * 1024, ErrorMessage = "File size should be within 4 MB")]
+        [FileTypes("jpg,jpeg,png,gif", ErrorMessage = "File Type is invalid")]
+        [Display(Name = "Father Image")]
+        public HttpPostedFileBase[] flFatherImageURL { get; set; } 
+        public string MotherImageURL { get; set; }
+
+        [SingleFileSize(4 * 1024 * 1024, ErrorMessage = "File size should be within 4 MB")]
+        [FileTypes("jpg,jpeg,png,gif", ErrorMessage = "File Type is invalid")]
+        [Display(Name = "Mother Image")]
+        public HttpPostedFileBase[] flMotherImageURL { get; set; } 
+        public bool IsFatherDelete { get; set; }
+        public bool IsMotherDelete { get; set; }
+
+        [Display(Name = "PEN Number")]
+        public string PENNumber { get; set; }
+    }
+}
