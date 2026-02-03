@@ -1,0 +1,107 @@
+using Entity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Data.SqlClient; 
+
+
+namespace DAL
+{
+    public class StudentDAL : CommonDAL
+    {
+        public DataSet AddUpdateDeleteStudent(StudentEntity log)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "ERP_AddUpdateDeleteStudent";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("@StudentID", SqlDbType.Int)).Value = log.StudentID;
+            cmd.Parameters.Add(new SqlParameter("@FirstName", SqlDbType.NVarChar)).Value = log.FirstName;
+            cmd.Parameters.Add(new SqlParameter("@LastName", SqlDbType.NVarChar)).Value = log.LastName;
+            cmd.Parameters.Add(new SqlParameter("@AdmissionNo", SqlDbType.VarChar)).Value = log.AdmissionNo;
+            cmd.Parameters.Add(new SqlParameter("@DateofBirth", SqlDbType.Date)).Value = log.DateofBirth;
+            cmd.Parameters.Add(new SqlParameter("@MobileNo", SqlDbType.VarChar)).Value = log.MobileNo;
+            cmd.Parameters.Add(new SqlParameter("@EmailID", SqlDbType.VarChar)).Value = log.EmailID;
+            cmd.Parameters.Add(new SqlParameter("@AdmissionDate", SqlDbType.Date)).Value = string.IsNullOrWhiteSpace(log.AdmissionDate) ? null : log.AdmissionDate;
+            cmd.Parameters.Add(new SqlParameter("@FatherName", SqlDbType.NVarChar)).Value = log.FatherName;
+            cmd.Parameters.Add(new SqlParameter("@MotherName", SqlDbType.NVarChar)).Value = log.MotherName;
+            cmd.Parameters.Add(new SqlParameter("@Gender", SqlDbType.VarChar)).Value = log.Gender;
+            cmd.Parameters.Add(new SqlParameter("@Nationality", SqlDbType.VarChar)).Value = log.Nationality;
+            cmd.Parameters.Add(new SqlParameter("@CategoryID", SqlDbType.Int)).Value = log.StudentCategoryID;
+            cmd.Parameters.Add(new SqlParameter("@AdmissionSessionID", SqlDbType.Int)).Value = log.AdmissionSessionID;
+            cmd.Parameters.Add(new SqlParameter("@CreatedBy", SqlDbType.Int)).Value = log.CreatedUserID_;
+            cmd.Parameters.Add(new SqlParameter("@ClassSectionID", SqlDbType.Int)).Value = log.ClassSectionID;
+            cmd.Parameters.Add(new SqlParameter("@BoardRollNo", SqlDbType.VarChar)).Value = log.BoardRollNo;
+            cmd.Parameters.Add(new SqlParameter("@PrevFee", SqlDbType.Decimal)).Value = log.PrevFee;
+            cmd.Parameters.Add(new SqlParameter("@UDISENo", SqlDbType.VarChar)).Value = log.UDISENo; 
+            cmd.Parameters.Add(new SqlParameter("@RollNo", SqlDbType.VarChar)).Value = log.RollNo; 
+            cmd.Parameters.Add(new SqlParameter("@IsDelete", SqlDbType.Bit)).Value = log.IsDelete;
+            cmd.Parameters.Add(new SqlParameter("@SessionID", SqlDbType.Int)).Value = log.SessionID;
+            cmd.Parameters.Add(new SqlParameter("@SchoolID", SqlDbType.Int)).Value = log.SchoolID;
+            cmd.Parameters.Add(new SqlParameter("@IsActive", SqlDbType.Bit)).Value = log.IsActive;
+            cmd.Parameters.Add(new SqlParameter("@FatherMobileNo", SqlDbType.VarChar)).Value = log.FatherMobileNo;
+            cmd.Parameters.Add(new SqlParameter("@FatherAadharCardNo", SqlDbType.VarChar)).Value = log.FatherAadharCardNo;
+            cmd.Parameters.Add(new SqlParameter("@MotherMobileNo", SqlDbType.VarChar)).Value = log.MotherMobileNo;
+            cmd.Parameters.Add(new SqlParameter("@MotherAadharCardNo", SqlDbType.VarChar)).Value = log.MotherAadharCardNo;
+            cmd.Parameters.Add(new SqlParameter("@AadharCardNo", SqlDbType.VarChar)).Value = log.AadharCardNo;
+            cmd.Parameters.Add(new SqlParameter("@GuardianName", SqlDbType.NVarChar)).Value = log.GuardianName;
+            cmd.Parameters.Add(new SqlParameter("@GuardianMobileNo", SqlDbType.VarChar)).Value = log.GuardianMobileNo;
+            cmd.Parameters.Add(new SqlParameter("@EmergencyContactName", SqlDbType.NVarChar)).Value = log.EmergencyContactName;
+            cmd.Parameters.Add(new SqlParameter("@EmergencyContactNo", SqlDbType.VarChar)).Value = log.EmergencyContactNo;
+            cmd.Parameters.Add(new SqlParameter("@Address1", SqlDbType.NVarChar)).Value = log.Address1;
+            cmd.Parameters.Add(new SqlParameter("@Address2", SqlDbType.NVarChar)).Value = log.Address2;
+            cmd.Parameters.Add(new SqlParameter("@City", SqlDbType.NVarChar)).Value = log.CityName;
+            cmd.Parameters.Add(new SqlParameter("@State", SqlDbType.NVarChar)).Value = log.StateName;
+            cmd.Parameters.Add(new SqlParameter("@Pincode", SqlDbType.Int)).Value = log.Pincode;
+            cmd.Parameters.Add(new SqlParameter("@DateofCheckup", SqlDbType.Date)).Value = string.IsNullOrWhiteSpace(log.DateofCheckup) ? null : log.DateofCheckup;
+            cmd.Parameters.Add(new SqlParameter("@BloodGroup", SqlDbType.VarChar)).Value = log.BloodGroup;
+            cmd.Parameters.Add(new SqlParameter("@EyeSight", SqlDbType.VarChar)).Value = log.EyeSight;
+            cmd.Parameters.Add(new SqlParameter("@Height", SqlDbType.VarChar)).Value = log.Height;
+            cmd.Parameters.Add(new SqlParameter("@Weight", SqlDbType.VarChar)).Value = log.Weight;
+            cmd.Parameters.Add(new SqlParameter("@IsHandiCap", SqlDbType.Bit)).Value = log.IsHandiCap;
+            cmd.Parameters.Add(new SqlParameter("@HandiCapDetails", SqlDbType.VarChar)).Value = log.HandiCapDetails;
+            cmd.Parameters.Add(new SqlParameter("@NextDateofCheckup", SqlDbType.Date)).Value = string.IsNullOrWhiteSpace(log.NextDateofCheckup) ? null : log.NextDateofCheckup;
+            cmd.Parameters.Add(new SqlParameter("@ImageURL", SqlDbType.VarChar)).Value = log.ImageURL;
+            cmd.Parameters.Add(new SqlParameter("@FatherImageURL", SqlDbType.VarChar)).Value = log.FatherImageURL;
+            cmd.Parameters.Add(new SqlParameter("@MotherImageURL", SqlDbType.VarChar)).Value = log.MotherImageURL;
+            cmd.Parameters.Add(new SqlParameter("@Operation", SqlDbType.Int)).Value = log.Operation;
+            cmd.Parameters.Add(new SqlParameter("@xml", SqlDbType.VarChar)).Value = log.xml;
+            cmd.Parameters.Add(new SqlParameter("@PENNumber", SqlDbType.VarChar)).Value = log.PENNumber;
+            
+            return ExecuteDataReader(cmd);
+        } 
+        public DataSet GetStudentList(StudentEntity log)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "ERP_spGetStudentList";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("@StudentID", SqlDbType.Int)).Value = log.StudentID;
+            cmd.Parameters.Add(new SqlParameter("@ClassSectionID", SqlDbType.Int)).Value = log.ClassSectionID;
+            cmd.Parameters.Add(new SqlParameter("@StudentName", SqlDbType.VarChar)).Value = log.FirstName;
+            cmd.Parameters.Add(new SqlParameter("@SchoolID", SqlDbType.Int)).Value = log.SchoolID;
+            cmd.Parameters.Add(new SqlParameter("@SessionID", SqlDbType.Int)).Value = log.SessionID;
+            cmd.Parameters.Add(new SqlParameter("@GetType", SqlDbType.Int)).Value = log.IsAll;
+            cmd.Parameters.Add(new SqlParameter("@GetType1", SqlDbType.Int)).Value = log.IsAll1;
+            cmd.Parameters.Add(new SqlParameter("@PageNo", SqlDbType.Int)).Value = log.PageNo;
+            cmd.Parameters.Add(new SqlParameter("@PageSize", SqlDbType.Int)).Value = log.PageSize;
+            cmd.Parameters.Add(new SqlParameter("@LoginID", SqlDbType.Int)).Value = log.CreatedUserID_;
+
+            return ExecuteDataReader(cmd);
+        }
+
+        public DataSet GetNewStudentProfileList(StudentEntity log)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "ERP_spGetStudent_Profile";
+            cmd.CommandType = CommandType.StoredProcedure;
+            // Add Parameters to SQL Command
+            cmd.Parameters.Add(new SqlParameter("@CandidateID", SqlDbType.Int)).Value = log.StudentID;
+            cmd.Parameters.Add(new SqlParameter("@SchoolID", SqlDbType.Int)).Value = log.SchoolID;
+            cmd.Parameters.Add(new SqlParameter("@SessionID", SqlDbType.Int)).Value = log.SessionID;
+            cmd.Parameters.Add(new SqlParameter("@GetType", SqlDbType.Int)).Value = log.IsAll;
+            cmd.Parameters.Add(new SqlParameter("@LoginID", SqlDbType.Int)).Value = log.CreatedUserID_;
+            return ExecuteDataReader(cmd);
+        }
+    }
+}
