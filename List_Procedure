@@ -1,0 +1,240 @@
+USE [Main_Project]
+GO 
+ALTER PROCEDURE [dbo].[ERP_spGetStudentList]
+						@StudentID int=0,
+						@ClassSectionID int=0,
+						@StudentName varchar(50)='', 
+						@SchoolID int=0, 
+						@SessionID int=0,
+						@GetType int=0, 
+						@GetType1 int=0,
+						@PageNo int=1,
+						@PageSize int=10,  
+						@LoginID int=0   
+
+AS
+BEGIN 
+	SET NOCOUNT ON;  
+		  CREATE TABLE #Student(StudentID int) 
+		  
+		  DECLARE @UserTypeID int=0;   
+
+		  SELECT @UserTypeID=UserTypeID 
+		  FROM dbo.ERP_LoginTable WITH(NOLOCK) 
+		  WHERE LoginID=@LoginID;
+
+	  IF @GetType=1 BEGIN
+			SELECT TOP 30
+				 st.StudentID
+				,st.AdmissionNo + ' - ' + st.FirstName + ' ' + ISNULL(st.LastName,'') + ', ' + csv.ClassName + ' ' + csv.SectionName + ', ' + st.FatherName As StudentName
+			FROM dbo.ERP_StudentTable st WITH(NOLOCK)
+			INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.StudentID=st.StudentID AND sst.IsActive=1 AND sst.IsDelete=0 AND sst.SessionID=@SessionID AND sst.SchoolID=@SchoolID
+			INNER JOIN dbo.ERP_ClassSectionAssign_View csv ON csv.ClassSectionID=sst.ClassSectionID AND csv.SessionID=sst.SessionID AND csv.SchoolID=sst.SchoolID
+	 		WHERE   
+				(ISNULL(@StudentID,0) =0 OR st.StudentID=@StudentID) 
+			AND (ISNULL(@StudentName,'') ='' OR st.AdmissionNo like '%' + @StudentName + '%'  OR st.FirstName like '%' + @StudentName + '%' OR st.MobileNo like '%' + @StudentName + '%')
+			AND (@SchoolID =0 OR sst.SchoolID=@SchoolID) AND sst.SessionID=@SessionID 
+			ORDER BY FirstName;
+
+		return;
+	 END 
+	   
+	 ELSE IF @GetType=30 BEGIN
+	 
+				ALTER TABLE #Student ADD [rOrderNo] int,[rOrderNo2] int,[Admission Session] varchar(20),[First Name] nvarchar(50),[Last Name] nvarchar(50),[Admission No] varchar(50),[Date of Birth] varchar(10),
+										 [Mobile No] varchar(10),[EmailID] varchar(50),[Admission Date] varchar(10),[Father Name] nvarchar(50),[Mother Name] nvarchar(50),[Gender] varchar(10),[Nationality] varchar(20),
+										 [Roll No] varchar(10),[UDISE No] varchar(50),[Board Roll No] varchar(25),[Class Name] varchar(50),[Father Mobile No] varchar(10),[Father Aadhar Card No] varchar(12),[Mother Mobile No] varchar(10),
+										 [Mother Aadhar Card No] varchar(12),[Aadhar Card No] varchar(12),[Guardian Name] nvarchar(50),[Guardian Mobile No] varchar(10),[Emergency Contact Name] nvarchar(50),[Emergency Contact No] varchar(10),
+										 [Address] nvarchar(500),[City] nvarchar(50),[State] nvarchar(50),[Pincode] int,[Date of Check up] varchar(10),[Blood Group] varchar(5),[Eye Sight] varchar(5),[Height] varchar(10),[Weight] varchar(10),
+										 [Next Date of Check up] varchar(10);
+
+				ALTER TABLE #Student DROP COLUMN StudentID;
+
+				INSERT INTO #Student([rOrderNo],[rOrderNo2],[Admission Session],[First Name],[Last Name],[Admission No],[Date of Birth],[Mobile No],[EmailID],[Admission Date],[Father Name],[Mother Name],[Gender],[Nationality],
+									 [Roll No],[UDISE No],[Board Roll No],[Class Name],[Father Mobile No],[Father Aadhar Card No],[Mother Mobile No],[Mother Aadhar Card No],[Aadhar Card No],[Guardian Name],[Guardian Mobile No],
+									 [Emergency Contact Name],[Emergency Contact No],[Address],[City],[State],[Pincode],[Date of Check up],[Blood Group],[Eye Sight],[Height],[Weight],[Next Date of Check up])
+		 		SELECT  
+					   csv.rOrderNo
+					  ,csv.rOrderNo2
+					  ,ss.SessionName
+					  ,st.FirstName
+					  ,st.LastName
+					  ,st.AdmissionNo
+					  ,Convert(varchar(10),st.DateofBirth,103)
+					  ,st.MobileNo
+					  ,st.EmailID
+					  ,Convert(varchar(10),st.AdmissionDate,103)
+					  ,st.FatherName
+					  ,st.MotherName
+					  ,st.Gender
+					  ,st.Nationality
+					  ,sst.RollNo
+					  ,sst.UDISENo
+					  ,sst.BoardRollNo
+					  ,csv.ClassName + ' ' +  csv.SectionName
+					  ,soi.FatherMobileNo
+					  ,soi.FatherAadharCardNo
+					  ,soi.MotherMobileNo
+					  ,soi.MotherAadharCardNo
+					  ,soi.AadharCardNo
+					  ,soi.GuardianName
+					  ,soi.GuardianMobileNo
+					  ,soi.EmergencyContactName
+					  ,soi.EmergencyContactNo 
+					  ,sct.Address1 + ' ' + sct.Address2
+					  ,sct.City
+					  ,sct.State
+					  ,sct.Pincode
+					  ,Convert(varchar(10),sht.DateofCheckup,103)
+					  ,sht.BloodGroup
+					  ,sht.EyeSight
+					  ,sht.Height
+					  ,sht.Weight
+					  ,Convert(varchar(10),sht.NextDateofCheckup,103)
+				FROM dbo.ERP_StudentTable st WITH(NOLOCK)
+				INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.StudentID=st.StudentID AND sst.IsDelete=0 
+				INNER JOIN dbo.ERP_ClassSectionAssign_View csv ON csv.ClassSectionID=sst.ClassSectionID AND csv.SchoolID=sst.SchoolID AND csv.SessionID=sst.SessionID
+				INNER JOIN dbo.ERP_StudentOtherInformationTable soi WITH(NOLOCK) ON soi.StudentID=sst.StudentID 
+				INNER JOIN dbo.ERP_StudentContactTable sct WITH(NOLOCK) ON sct.StudentID=sst.StudentID
+				INNER JOIN dbo.ERP_StudentHealthInfoTable sht WITH(NOLOCK) ON sht.StudentID=sst.StudentID
+				LEFT JOIN dbo.ERP_SessionTable ss WITH(NOLOCK) ON st.AdmissionSessionID=ss.SessionID
+ 				WHERE 
+					(ISNULL(@StudentID,0) =0 OR st.StudentID=@StudentID)
+				AND (ISNULL(@ClassSectionID,0)=0 OR sst.ClassSectionID=@ClassSectionID) 
+		 		AND sst.SchoolID=@SchoolID AND sst.SessionID=@SessionID 
+
+				SELECT 
+						ROW_NUMBER() OVER (ORDER BY t.[rOrderNo],t.[rOrderNo2],[First Name]) AS 'S.No.'
+					   ,t.[First Name]
+					   ,t.[Last Name]
+					   ,t.[Date of Birth] 
+					   ,t.[Admission No]
+					   ,t.[Father Name]
+					   ,t.[Mother Name] 
+					   ,t.[Mobile No]
+					   ,t.[EmailID] 
+				FROM #Student t;  
+				
+				IF(@GetType1=1) BEGIN
+				  return; 
+				END
+
+				IF(@GetType1=30) BEGIN
+						 exec ERP_spGetSchoolList @GetType=3,@SchoolID=@SchoolID;
+				  return;
+				END
+	     return;
+	END
+
+	ELSE IF @GetType=32 BEGIN 				
+					ALTER TABLE #Student ADD rownum int,FirstName nvarchar(100),AdmissionNo varchar(50),MobileNo varchar(10),EmailID varchar(50),FatherName nvarchar(50),MotherName nvarchar(50),
+										 ClassName varchar(50),IsActive bit; 
+	
+					INSERT INTO #Student(StudentID,rownum,FirstName,AdmissionNo,MobileNo,EmailID,FatherName,MotherName,ClassName,IsActive)  
+					SELECT
+						 st.StudentID 
+						,ROW_NUMBER() OVER (ORDER BY ct.rOrderNo,ct.rOrderNo2,st.FirstName) AS rownum 
+						,st.FirstName + ' ' + ISNULL(st.LastName,'') 
+					    ,st.AdmissionNo
+						,st.MobileNo
+						,st.EmailID
+						,st.FatherName
+						,st.MotherName
+						,ct.ClassName + ' - ' + ct.SectionName
+						,sst.IsActive
+					FROM dbo.ERP_StudentTable st WITH(NOLOCK) 	  
+					INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.IsDelete=0 AND sst.StudentID=st.StudentID AND sst.SchoolID=@SchoolID AND sst.SessionID=@SessionID
+					LEFT JOIN dbo.ERP_ClassSectionAssign_View ct ON ct.ClassSectionID=sst.ClassSectionID AND ct.SessionID=sst.SessionID AND ct.SchoolID=sst.SchoolID
+		 			WHERE 
+						(ISNULL(@StudentID,0) =0 OR st.StudentID=@StudentID)
+					AND (ISNULL(@ClassSectionID,0)=0 OR sst.ClassSectionID=@ClassSectionID)  
+					AND sst.IsDelete=0  
+					AND sst.SchoolID=@SchoolID AND sst.SessionID=@SessionID 
+
+			SELECT
+				*
+			FROM
+			( 
+				SELECT 
+					 StudentID
+					,rownum
+					,FirstName 
+					,AdmissionNo
+					,MobileNo
+					,EmailID
+					,FatherName
+					,MotherName
+					,ClassName
+					,IsActive
+				FROM #Student 
+				WHERE rownum BETWEEN (((@PageNo-1) * @PageSize)+1)  AND (@PageSize* @PageNo)
+			)t 
+			ORDER BY rownum;
+
+			 SELECT COUNT(1) 
+ 			 FROM #Student; 
+	  
+		     exec ERP_spGetClassSectionList 0,0,1,1,1,10,@LoginID,@SchoolID,@SessionID;
+
+	     return; 
+	END   
+
+		SELECT  
+				 st.StudentID
+				,st.AdmissionSessionID
+				,st.FirstName
+				,st.LastName
+				,st.AdmissionNo
+				,Convert(varchar(10),st.DateofBirth,103) AS DateofBirth
+				,st.MobileNo
+				,st.EmailID
+				,st.CategoryID
+				,Convert(varchar(10),st.AdmissionDate,103) AS AdmissionDate
+				,st.FatherName
+				,st.MotherName
+				,st.Gender
+				,st.Nationality
+				,sst.RollNo
+				,sst.UDISENo
+				,sst.BoardRollNo 
+				,sst.PrevFee
+				,sst.ClassSectionID
+				,ISNULL(sst.ConcessionID,0) AS ConcessionID 
+				,soi.FatherMobileNo
+				,soi.FatherAadharCardNo
+				,soi.MotherMobileNo
+				,soi.MotherAadharCardNo
+				,soi.AadharCardNo
+				,soi.GuardianName
+				,soi.GuardianMobileNo
+				,soi.EmergencyContactName
+				,soi.EmergencyContactNo 
+				,sct.Address1
+				,sct.Address2
+				,sct.City
+				,sct.State
+				,sct.Pincode
+				,Convert(varchar(10),sht.DateofCheckup,103) AS DateofCheckup
+				,sht.BloodGroup
+				,sht.EyeSight
+				,sht.Height
+				,sht.Weight
+				,sht.IsHandiCap
+				,sht.HandiCapDetails
+				,Convert(varchar(10),sht.NextDateofCheckup,103) AS NextDateofCheckup
+				,sit.FatherImageURL
+				,sit.ImageURL
+				,sit.MotherImageURL
+				,ISNULL(st.PENNumber,'') AS PENNumber
+		FROM dbo.ERP_StudentTable st WITH(NOLOCK)
+		INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.StudentID=st.StudentID AND sst.IsDelete=0  
+		INNER JOIN dbo.ERP_StudentOtherInformationTable soi WITH(NOLOCK) ON soi.StudentID=sst.StudentID 
+		INNER JOIN dbo.ERP_StudentContactTable sct WITH(NOLOCK) ON sct.StudentID=sst.StudentID
+		INNER JOIN dbo.ERP_StudentHealthInfoTable sht WITH(NOLOCK) ON sht.StudentID=sst.StudentID
+		LEFT JOIN dbo.ERP_StudentImageTable sit WITH(NOLOCK) ON sit.StudentID=st.StudentID
+		WHERE st.StudentID=@StudentID;
+	   
+	   exec ERP_spGetClassSectionList 0,0,1,1,1,10,@LoginID,@SchoolID,@SessionID;
+	   exec ERP_spGetSessionList 0,'',1,1,10,@SchoolID;
+	   exec ERP_spGetCategoryList 0,'',1,1,10,@SchoolID,0;
+END 
