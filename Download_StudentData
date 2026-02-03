@@ -1,0 +1,48 @@
+ public ActionResult CandidateList(int studentid = 0, int classsectionid = 0, string filetype_ = "exl")
+        {
+            string ReportName = "STUDENT DETAILS";
+            if (GetPageProperties(11, 5))
+            {
+                using (DataSet ds = new StudentDAL().GetStudentList(new StudentEntity()
+                {
+                    SchoolID = Convert.ToInt32(SessionHandler.SchoolID),
+                    SessionID = Convert.ToInt32(SessionHandler.SessionID),
+                    CreatedUserID_ = SessionHandler.LoginID,
+                    StudentID = studentid,
+                    ClassSectionID = classsectionid,
+                    IsAll = 30,
+                    IsAll1 = 30
+                }))
+                {
+                    if (ds != null)
+                        if (ds.Tables.Count > 0)
+                        {
+                            if (filetype_ == "pdf")
+                            {
+                                System.Web.UI.WebControls.GridView gv = new System.Web.UI.WebControls.GridView();
+                                gv.DataSource = ds.Tables[0];
+                                gv.DataBind();
+                                StringWriter sw = new StringWriter();
+                                HtmlTextWriter htw = new HtmlTextWriter(sw);
+                                gv.RenderControl(htw);
+                                TempData["html"] = "<center><b>" + ReportName + "</b></center><br>" + sw.ToString();
+                                TempData["dt"] = ds.Tables[1];
+                                return RedirectToAction("DownloadPdf");
+                            }
+                            using (DataSet nds = new DataSet())
+                            {
+                                DataTable dt1 = new DataTable(ReportName);
+                                dt1 = ds.Tables[0].Copy();
+                                dt1.TableName = ReportName;
+                                nds.Tables.Add(dt1);
+                                if (ds.Tables.Count > 1)
+                                    return new DownloadFileActionResult(ReportName + ".xlsx", nds, ds.Tables[1], ReportName + "");
+                                else if (ds.Tables.Count > 0)
+                                    return new DownloadFileActionResult(ReportName + ".xlsx", nds, null, ReportName + "");
+                            }
+                        }
+                }
+            }
+            TempData["html"] = "no Records!!";
+            return RedirectToAction("DownloadPdf");
+        }
