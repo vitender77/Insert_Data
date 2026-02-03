@@ -1,0 +1,266 @@
+ public ActionResult AddCandidate(string id)
+        {
+            StudentEntity stf = new StudentEntity();
+            if (GetPageProperties(11, 1))
+            {
+                if (id != null)
+                {
+                    stf.StudentID = Convert.ToInt32(id);
+                    stf.SchoolID = Convert.ToInt32(SessionHandler.SchoolID);
+                    stf.SessionID = Convert.ToInt32(SessionHandler.SessionID);
+                    stf.CreatedUserID_ = SessionHandler.LoginID;
+                    DataSet dt = new StudentDAL().GetStudentList(stf);
+                    foreach (DataRow dr in dt.Tables[0].Rows)
+                    {
+                        stf.StudentID = Convert.ToInt32(dr["StudentID"]);
+                        stf.AdmissionSessionID = Convert.ToInt32(dr["AdmissionSessionID"]);
+                        stf.FirstName = Convert.ToString(dr["FirstName"]);
+                        stf.LastName = Convert.ToString(dr["LastName"]);
+                        stf.AdmissionNo = Convert.ToString(dr["AdmissionNo"]);
+                        stf.DateofBirth = Convert.ToString(dr["DateofBirth"]);
+                        stf.MobileNo = Convert.ToString(dr["MobileNo"]);
+                        stf.EmailID = Convert.ToString(dr["EmailID"]);
+                        stf.StudentCategoryID = Convert.ToInt32(dr["CategoryID"]);
+                        stf.AdmissionDate = Convert.ToString(dr["AdmissionDate"]);
+                        stf.FatherName = Convert.ToString(dr["FatherName"]);
+                        stf.MotherName = Convert.ToString(dr["MotherName"]);
+                        stf.Gender = Convert.ToString(dr["Gender"]);
+                        stf.Nationality = Convert.ToString(dr["Nationality"]);
+                        stf.RollNo = Convert.ToString(dr["RollNo"]);
+                        stf.UDISENo = Convert.ToString(dr["UDISENo"]);
+                        stf.BoardRollNo = Convert.ToString(dr["BoardRollNo"]);
+                        stf.PrevFee = Convert.ToDecimal(dr["PrevFee"]);
+                        stf.ClassSectionID = Convert.ToInt32(dr["ClassSectionID"]);
+                        stf.ConcessionID = Convert.ToInt32(dr["ConcessionID"]);
+                        stf.FatherMobileNo = Convert.ToString(dr["FatherMobileNo"]);
+                        stf.FatherAadharCardNo = Convert.ToString(dr["FatherAadharCardNo"]);
+                        stf.MotherMobileNo = Convert.ToString(dr["MotherMobileNo"]);
+                        stf.MotherAadharCardNo = Convert.ToString(dr["MotherAadharCardNo"]);
+                        stf.AadharCardNo = Convert.ToString(dr["AadharCardNo"]);
+                        stf.GuardianName = Convert.ToString(dr["GuardianName"]);
+                        stf.GuardianMobileNo = Convert.ToString(dr["GuardianMobileNo"]);
+                        stf.EmergencyContactName = Convert.ToString(dr["EmergencyContactName"]);
+                        stf.EmergencyContactNo = Convert.ToString(dr["EmergencyContactNo"]);
+                        stf.Address1 = Convert.ToString(dr["Address1"]);
+                        stf.Address2 = Convert.ToString(dr["Address2"]);
+                        stf.CityName = Convert.ToString(dr["City"]);
+                        stf.StateName = Convert.ToString(dr["State"]);
+                        stf.Pincode = Convert.ToString(dr["Pincode"]);
+                        stf.DateofCheckup = Convert.ToString(dr["DateofCheckup"]);
+                        stf.BloodGroup = Convert.ToString(dr["BloodGroup"]);
+                        stf.EyeSight = Convert.ToString(dr["EyeSight"]);
+                        stf.Height = Convert.ToString(dr["Height"]);
+                        stf.Weight = Convert.ToString(dr["Weight"]);
+                        stf.IsHandiCap = Convert.ToBoolean(dr["IsHandiCap"]);
+                        stf.HandiCapDetails = Convert.ToString(dr["HandiCapDetails"]);
+                        stf.NextDateofCheckup = Convert.ToString(dr["NextDateofCheckup"]);
+                        stf.FatherImageURL = Convert.ToString(dr["FatherImageURL"]);
+                        stf.ImageURL = Convert.ToString(dr["ImageURL"]);
+                        stf.MotherImageURL = Convert.ToString(dr["MotherImageURL"]);
+                        stf.PENNumber = Convert.ToString(dr["PENNumber"]);
+                    }  
+                    ViewBag.ClassSectionList = dt.Tables[1].AsEnumerable().Select(row =>
+                        new
+                        {
+                            ClassSectionID = row.Field<int>("ClassSectionID"),
+                            ClassSectionName = row.Field<string>("ClassSectionName")
+                        }).ToList();
+
+                    ViewBag.AdmissionSessionList = dt.Tables[2].AsEnumerable().Select(row =>
+                        new
+                        {
+                            AdmissionSessionID = row.Field<int>("SessionID"),
+                            AdmissionSessionName = row.Field<string>("SessionName")
+                        }).ToList();
+                     
+                    ViewBag.CategoryList = dt.Tables[3].AsEnumerable().Select(row =>
+                        new
+                        {
+                            CategoryID = row.Field<int>("CategoryID"),
+                            CategoryName = row.Field<string>("CategoryName")
+                        }).ToList();
+                }
+                else
+                {
+                    stf.SchoolID = Convert.ToInt32(SessionHandler.SchoolID);
+                    stf.SessionID = Convert.ToInt32(SessionHandler.SessionID);
+                    stf.CreatedUserID_ = SessionHandler.LoginID;
+                    DataSet dt = new StudentDAL().GetStudentList(stf); 
+                    ViewBag.ClassSectionList = dt.Tables[1].AsEnumerable().Select(row =>
+                        new
+                        {
+                            ClassSectionID = row.Field<int>("ClassSectionID"),
+                            ClassSectionName = row.Field<string>("ClassSectionName")
+                        }).ToList(); 
+
+                    ViewBag.AdmissionSessionList = dt.Tables[2].AsEnumerable().Select(row =>
+                        new
+                        {
+                            AdmissionSessionID = row.Field<int>("SessionID"),
+                            AdmissionSessionName = row.Field<string>("SessionName")
+                        }).ToList(); 
+
+                    ViewBag.CategoryList = dt.Tables[3].AsEnumerable().Select(row =>
+                        new
+                        {
+                            CategoryID = row.Field<int>("CategoryID"),
+                            CategoryName = row.Field<string>("CategoryName")
+                        }).ToList();
+                }
+            }
+            return View(stf);
+        }
+
+        public ActionResult CandidateList(string txtStudentName, int studentid = 0, int classsectionid = 0, int pageNo = 1, int pageitems = 0)
+        {
+            if (pageitems == 0)
+            {
+                pageitems = SessionHandler.pageitems;
+                ViewBag.PageItem = pageitems;
+            }
+            else { ViewBag.PageItem = pageitems; }
+            List<StudentEntity> list = new System.Collections.Generic.List<StudentEntity>();
+            if (GetPageProperties(11, 3))
+            {
+                DataSet dt = new StudentDAL().GetStudentList(new StudentEntity()
+                {
+                    SessionID = Convert.ToInt32(SessionHandler.SessionID),
+                    SchoolID = Convert.ToInt32(SessionHandler.SchoolID),
+                    StudentID = studentid,
+                    ClassSectionID = classsectionid, 
+                    PageNo = pageNo,
+                    PageSize = pageitems,
+                    IsAll = 32,
+                });
+
+                foreach (DataRow dr in dt.Tables[0].Rows)
+                {
+                    list.Add(new StudentEntity()
+                    {
+                        StudentID = Convert.ToInt32(dr["StudentID"]),
+                        DeleteUpdateID = Convert.ToInt32(dr["rownum"]),
+                        FirstName = Convert.ToString(dr["FirstName"]), 
+                        AdmissionNo = Convert.ToString(dr["AdmissionNo"]),
+                        MobileNo = Convert.ToString(dr["MobileNo"]),
+                        EmailID = Convert.ToString(dr["EmailID"]),
+                        FatherName = Convert.ToString(dr["FatherName"]),
+                        MotherName = Convert.ToString(dr["MotherName"]), 
+                        ClassSectionName = Convert.ToString(dr["ClassName"]),
+                        IsActive = Convert.ToBoolean(dr["IsActive"])
+                    });
+                }
+
+                int totalrecords = Convert.ToInt32(dt.Tables[1].Rows[0][0]);
+                ViewBag.TotalRecords = totalrecords;
+                if ((pageNo * pageitems) < totalrecords)
+                {
+                    ViewBag.pageN = pageNo + 1;
+                    ViewBag.pageP = pageNo == 1 ? 1 : pageNo - 1;
+                }
+                else if ((pageNo * pageitems) > totalrecords)
+                {
+                    ViewBag.pageN = pageNo;
+                    ViewBag.pageP = pageNo - 1;
+                }
+                else if ((pageNo * pageitems) == totalrecords)
+                {
+                    ViewBag.pageN = pageNo;
+                    ViewBag.pageP = pageNo > 1 ? pageNo - 1 : pageNo;
+                } 
+                ViewBag.ClassSectionList = dt.Tables[2].AsEnumerable().Select(row =>
+                    new
+                    {
+                        ClassSectionID = row.Field<int>("ClassSectionID"),
+                        ClassSectionName = row.Field<string>("ClassSectionName")
+                    }).ToList();
+            }
+            return View(list);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddCandidate(StudentEntity log, int btnType)
+        {
+            if (GetPageProperties(11, 1))
+            {
+                if (log.SchoolID == 0) log.SchoolID = Convert.ToInt32(SessionHandler.SchoolID);
+                if (log.SessionID == 0) log.SessionID = Convert.ToInt32(SessionHandler.SessionID);
+                if (log.ClassSectionID == 0) ModelState.AddModelError("ClassSectionID", "*");
+
+                ModelState.Remove("StudentID");
+                if (ModelState.IsValid)
+                {
+                    log.Operation = log.StudentID == 0 ? 1 : 2;
+                    log.CreatedUserID_ = SessionHandler.LoginID;
+                    string oldFileName = "";
+                    if (log.flImageURL[0] != null && log.flImageURL[0].ContentLength > 0)
+                    {
+                        IsSAtring = true;
+                        oldFileName = log.ImageURL;
+                        log.ImageURL = (string)SingleImageUpload(log.flImageURL[0]);
+                    }
+                    else if (log.IsDelete && !string.IsNullOrWhiteSpace(log.ImageURL))
+                    {
+                        DeleteOldFileFromFolder("temp", log.ImageURL);
+                        log.ImageURL = "";
+                    }
+                    string oldFatherName = "";
+                    if (log.flFatherImageURL[0] != null && log.flFatherImageURL[0].ContentLength > 0)
+                    {
+                        IsSAtring = true;
+                        oldFatherName = log.FatherImageURL;
+                        log.FatherImageURL = (string)SingleImageUpload(log.flFatherImageURL[0]);
+                    }
+                    else if (log.IsFatherDelete && !string.IsNullOrWhiteSpace(log.FatherImageURL))
+                    {
+                        DeleteOldFileFromFolder("temp", log.FatherImageURL);
+                        log.FatherImageURL = "";
+                    } 
+                    string oldMotherName = "";
+                    if (log.flMotherImageURL[0] != null && log.flMotherImageURL[0].ContentLength > 0)
+                    {
+                        IsSAtring = true;
+                        oldMotherName = log.MotherImageURL;
+                        log.MotherImageURL = (string)SingleImageUpload(log.flMotherImageURL[0]);
+                    }
+                    else if (log.IsMotherDelete && !string.IsNullOrWhiteSpace(log.MotherImageURL))
+                    {
+                        DeleteOldFileFromFolder("temp", log.MotherImageURL);
+                        log.MotherImageURL = "";
+                    }
+                    DataSet dt = new StudentDAL().AddUpdateDeleteStudent(log);
+                    int msg = Convert.ToInt32(dt.Tables[0].Rows[0][0]);
+                    if (btnType == 1) return RedirectToAction("CandidateList", "Candidate");
+                    log = new StudentEntity()
+                    {
+                        SchoolID = Convert.ToInt32(SessionHandler.SchoolID),
+                        SessionID = Convert.ToInt32(SessionHandler.SessionID),
+                    };
+                    ModelState.Clear();
+                    ViewBag.message = MessageEntity.messagebox(msg);  
+                }
+                log.CreatedUserID_ = SessionHandler.LoginID;
+                DataSet ds = new StudentDAL().GetStudentList(log); 
+                ViewBag.ClassSectionList = ds.Tables[1].AsEnumerable().Select(row =>
+                    new
+                    {
+                        ClassSectionID = row.Field<int>("ClassSectionID"),
+                        ClassSectionName = row.Field<string>("ClassSectionName")
+                    }).ToList(); 
+
+                ViewBag.AdmissionSessionList = ds.Tables[2].AsEnumerable().Select(row =>
+                    new
+                    {
+                        AdmissionSessionID = row.Field<int>("SessionID"),
+                        AdmissionSessionName = row.Field<string>("SessionName")
+                    }).ToList();
+
+                ViewBag.CategoryList = ds.Tables[3].AsEnumerable().Select(row =>
+                    new
+                    {
+                        CategoryID = row.Field<int>("CategoryID"),
+                        CategoryName = row.Field<string>("CategoryName")
+                    }).ToList();
+            }
+            return View(log);
+        }
