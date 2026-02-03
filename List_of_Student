@@ -1,0 +1,328 @@
+@model IList<Entity.StudentEntity>
+@{
+    Layout = "../Shared/_LayoutPage.cshtml";
+    ViewBag.Title = "Student List";
+    System.Data.DataRow[] dr = BMS_Arihant.Controllers.CheckPermission.GetPagePermission(11); 
+    bool isDelete = Convert.ToBoolean(dr.Count() == 0 ? false : Convert.ToBoolean(dr[0]["IsAll"]) ? true : dr[0]["isDelete"]);
+    bool isAdd = Convert.ToBoolean(dr.Count() == 0 ? false : Convert.ToBoolean(dr[0]["IsAll"]) ? true : dr[0]["isAdd"]);
+    bool isView = Convert.ToBoolean(dr.Count() == 0 ? false : Convert.ToBoolean(dr[0]["IsAll"]) ? true : dr[0]["isView"]);
+    bool isDownload = Convert.ToBoolean(dr.Count() == 0 ? false : Convert.ToBoolean(dr[0]["IsAll"]) ? true : dr[0]["isDownload"]);
+    
+    int lastRowNo = (Model.Count > 0 ? Model[Model.Count - 1].DeleteUpdateID : 0);
+    int firstRowNo = Model.Count > 0 ? Model[0].DeleteUpdateID : 0;
+}
+@using (Html.BeginForm("CandidateList", "Candidate", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <h2>
+        Student List
+    </h2>
+        <div>
+            @if (isView)
+            {
+                <div class="float-left">
+                    <div class="display-cell textAlign-right">
+                        <div class="filterButton" data-modal-id="filterModalBox">
+                            Search
+                        </div>
+                    </div>
+                    <div class="display-cell">
+                        <div class="PageItemsButton dropdown-button" data-activates="dropdown1">
+                            Page Items
+                        </div>
+                        <ul id="dropdown1" class="dropdown-content">
+                            <li>
+                                <a title="Page Item" href="#!">
+                                    <input name="pageItems" type="radio" value="10" id="rdopageItems1" />
+                                    <label for="rdopageItems1" style="width:100%"> 10</label>
+                                </a>
+                            </li>
+                            <li>
+                                <a title="Page Item" href="#!">
+                                    <input name="pageItems" type="radio" value="20" id="rdopageItems2" />
+                                    <label for="rdopageItems2" style="width:100%">
+                                        20
+                                    </label>
+                                </a>
+                            </li>
+                            <li>
+                                <a title="Page Item" href="#!">
+                                    <input name="pageItems" type="radio" value="50" id="rdopageItems3" />
+                                    <label for="rdopageItems3" style="width:100%">
+                                        50
+                                    </label>
+                                </a>
+                            </li>
+                            <li>
+                                <a title="Page Item" href="#!">
+                                    <input name="pageItems" type="radio" value="100" id="rdopageItems4" />
+                                    <label for="rdopageItems4" style="width:100%"> 
+                                        100
+                                    </label>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="display-cell textAlign-right top-paging" style='vertical-align: middle; padding: 0px;'>
+                        <div>
+                            @if (firstRowNo > 1)
+                            {
+                                <div pageNo="@ViewBag.pageP" align="center" class="leftArrow" title="Left ">
+                                </div>
+                            }
+                            <span class="pagin-text">@firstRowNo - @lastRowNo of @ViewBag.TotalRecords </span>
+                            @if (ViewBag.TotalRecords > lastRowNo)
+                            {
+                                <div align="center" pageNo="@ViewBag.pageN" class="rightArrow" title="Right">
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="float-right display-row">
+
+                <div class="fixed-action-btn click-to-toggle">
+                    <a class="btn-floating btn-medium cyan"><i class="SideBtnmenu"></i> </a>
+                    <ul>
+                        @if (isAdd)
+                        { 
+                            <li>
+                                <a class="btn-floating cyan tooltipped " href="~/Candidate/AddCandidate"
+                                   data-position="left" data-delay="50" data-tooltip="Add New Student"><i class="SideBtnadd"></i></a>
+                            </li> 
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="message">
+            @ViewBag.message
+        </div>
+    if (isView)
+    {
+        <div class='table mob-table CandidateList' id="tblRecordslist">
+            <div class='thead'>
+                <div class='tableRow'>
+                    <div class="tablecellList firstTD">
+                    </div> 
+                    <div class="tablecellList checkBoxTD">
+                        S.No.
+                    </div>
+                    <div class="tablecellList">
+                        Student Name
+                    </div>
+                    <div class="tablecellList">
+                        Admission No
+                    </div>
+                    <div class="tablecellList">
+                        Father Name
+                    </div>
+                    <div class="tablecellList">
+                        Mother Name
+                    </div>
+                    <div class="tablecellList">
+                        Class & Section
+                    </div>
+                    <div class="tablecellList">
+                        Mobile
+                    </div>
+                    <div class="tablecellList">
+                        Email
+                    </div>
+                </div>
+            </div>
+            <div class="tbody">
+                @for (var i = 0; i < Model.Count; i++)
+                    {
+                <div class="tableRow">
+                    <div class="tablecellList firstTD switch">
+                        @{
+                                if (isAdd)
+                                {
+                            <a href="~/Candidate/AddCandidate/@Model[i].StudentID" title="edit" class="left">
+                                <i class="edit orange-text md-30"></i>
+                            </a>
+                                    {
+                                        string title_ = "Deactivated";
+                                        if (Convert.ToBoolean(Model[i].IsActive)) { title_ = "Activated"; }
+                            <label class="left">
+                                <input class="js-open-modal firepo" checked="@Model[i].IsActive" type="checkbox" activeid="@Model[i].StudentID" title="@title_" isactive="@Convert.ToInt32(Model[i].IsActive)" url_="/AjaxCalls/DeleteUpdateStudent" actiontype="4" data-modal-id="confirmation" />
+                                <span class="lever"></span>
+                            </label>
+                                    }
+                                }
+                                if (isDelete)
+                                {
+                            <i deleteid="@Model[i].StudentID" title="Delete" isactive="@Convert.ToInt32(Model[i].IsDelete)" url_="/AjaxCalls/DeleteUpdateStudent" actiontype="3" class="js-open-modal firepo imgDelete material-icons red-text md-30" data-modal-id="confirmation">
+                            </i>
+                                }
+                        }
+                    </div> 
+                    <div class="tablecellList" data-label='S.No. :'>
+                        @Html.HiddenFor(a => a[i].StudentID) 
+                        @Model[i].DeleteUpdateID
+                    </div>
+                    <div class="tablecellList" data-label='Student Name :'>
+                        @Model[i].FirstName
+                    </div>
+                    <div class="tablecellList" data-label='Admission No :'>
+                        @Html.HiddenFor(a => a[i].AdmissionNo)
+                        @Model[i].AdmissionNo
+                    </div>
+                    <div class="tablecellList" data-label='Father Name :'>
+                        @Model[i].FatherName
+                    </div>
+                    <div class="tablecellList" data-label='Mother Name :'>
+                        @Model[i].MotherName
+                    </div>
+                    <div class="tablecellList" data-label='Class & Section :'>
+                        @Model[i].ClassSectionName
+                    </div>
+                    <div class="tablecellList" data-label='Mobile No :'> 
+                        @Model[i].MobileNo
+                    </div>
+                    <div class="tablecellList" data-label='Email ID :'> 
+                        @Model[i].EmailID
+                    </div>
+                </div>
+                                }
+            </div>
+        </div>
+
+            <div class="table">
+                <div class="tfoot">
+                    @if (Model.Count == 0)
+                    {
+                        <div class="tableRow">
+                            <div class="tablecellList" style="text-align: center">
+                                No Records Found.
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="tableRow">
+                            <div class="tablecellList paging" align="center">
+                                <div style="text-align: center; width: 60px" align="center">
+                                    @if (firstRowNo > 1)
+                                    {<div pageNo="@ViewBag.pageP" align="center" class="leftArrow" title="Left ">
+                                    </div>
+                                    }
+                                    @if (ViewBag.TotalRecords > lastRowNo)
+                                    {
+                                    <div align="center" pageNo="@ViewBag.pageN" class="rightArrow" title="Right">
+                                    </div>
+                                    }
+                                </div>
+                                @Html.Hidden("pageNo")
+                            </div>
+                        </div>
+                        if (isDownload)
+                        {
+                            <div class="tableRow">
+                                <div class="tablecellList" colspan="9" style="text-align: right; padding: 4px;">
+                                    <a filetype="pdf" target="blank" href="@Url.Action("CandidateList", "Download", new { filetype = "pdf", studentid = "xxxx", classsectionid = "yyyy" })" id="lnkPdf">
+                                        <div title="Download PDF" class="PdfSmall">
+                                        </div>
+                                    </a><a target="_blank" href="@Url.Action("CandidateList", "Download", new { studentid = "xxxx", classsectionid = "yyyy"  })" id="lnk">
+                                        <div title="Download Excel" class="imgexcell">
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div id="filterModalBox" class="modal-box">
+                <header>
+                    <span class="js-modal-close close btnpopUpClose"></span>
+                    <h3>
+                        Search
+                    </h3>
+                </header>
+                <div class="modal-body">
+                    <div class="input-field col s1">
+                        @Html.Hidden("studentid", "0")
+                        @Html.TextBox("txtStudentName", "")
+                        @Html.Label("txtStudentName", "Candidate Name")
+                    </div>
+                    <div class="input-field col s1">  
+                        @Html.DropDownList("classsectionid", new SelectList(ViewBag.ClassSectionList, "ClassSectionID", "ClassSectionName"), "Select Class & Section")
+                        @Html.Label("classsectionid","Select Class & Section") 
+                    </div>
+                </div>
+                <footer style="text-align: center">
+                    <input type="submit" name="CandidateList:Apply_" id="btnApply" value="Search" class="btn btn-small js-modal-yes" />
+                </footer>
+            </div>
+    }
+    else
+    {
+        @Html.Partial("~/Views/Shared/_ViewPremissionMessage.cshtml");
+        }
+    } 
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.showhideonclick').hide();
+
+        $('.CandidateList input[type="checkbox"]').click(function () {
+            if ($('.checkboxROW input[type="checkbox"]:checked').length > 0) $('.showhideonclick').css('display', 'inline-block');
+            else $('.showhideonclick').hide();
+        });
+
+        $("input[name='pageItems'][value='@(Convert.ToInt32(ViewBag.PageItem))']").attr('checked', true);
+
+
+        $("#lnk,#lnkPdf").click(function (evt) {
+            var filetype = $(this).attr("filetype");
+            $(this).prop("href", "/Download/CandidateList?filetype_=" + filetype + "&studentid=" + $("#studentid").val() + "&classsectionid=" + $("#classsectionid").val());
+        });
+
+        $("#txtStudentName").change(function () {
+            if ($(this).val() == "") {
+                $("#studentid").val(0);
+            }
+        });
+
+        $('body').on('keyup keypress', function (e) {
+            var keyCode = e.keyCode || e.which;
+            if (keyCode == 13) {
+                $('#btnApply').click();
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        $("#txtStudentName").change(function () {
+            if ($(this).val() == "") {
+                $("#studentid").val(0);
+            }
+        });
+
+        $("#txtStudentName").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/Cascading/GetStudentList",
+                    type: "POST",
+                    dataType: "json",
+                    data: { name: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item.StudentName, value: item.StudentID };
+                        }))
+                    }
+                })
+            },
+            select: function (event, ui) {
+                $("#studentid").val(ui.item.value);
+                $("#txtStudentName").val(ui.item.label);
+                return false;
+            }
+        });
+    });
+</script>
