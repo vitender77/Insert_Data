@@ -1,0 +1,366 @@
+@using Entity;
+@model Entity.StudentEntity 
+@{
+    Layout = "../Shared/_LayoutPage.cshtml";
+    ViewBag.Title = "Add New Student";
+    System.Data.DataRow[] dr = BMS_Arihant.Controllers.CheckPermission.GetPagePermission(11);
+
+    bool isAdd = Convert.ToBoolean(dr.Count() == 0 ? false : Convert.ToBoolean(dr[0]["IsAll"]) ? true : dr[0]["isAdd"]);
+    bool isView = Convert.ToBoolean(dr.Count() == 0 ? false : Convert.ToBoolean(dr[0]["IsAll"]) ? true : dr[0]["isView"]);
+}
+
+@using (Html.BeginForm("AddCandidate", "Candidate", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    if (isView)
+    {
+        <a class="btn-floating waves-effect waves-light right cyan tooltipped" data-position="bottom"
+           data-delay="50" data-tooltip="Student List" href="~/Candidate/CandidateList">
+            <i class="SideBtnmenu">
+            </i>
+        </a>
+    }
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <h2>
+        Add New Student
+    </h2>
+    if (@ViewBag.message != null)
+    {
+        <div class="message">
+            @ViewBag.message
+        </div>
+    }
+    @Html.HiddenFor(a => a.StudentID)
+    if (isAdd)
+    {
+        <div class="input-field">
+            @Html.DropDownListFor(a => a.AdmissionSessionID, new SelectList(ViewBag.AdmissionSessionList, "AdmissionSessionID", "AdmissionSessionName", Model.AdmissionSessionID), "Select Admission Session")
+            @Html.LabelFor(a => a.AdmissionSessionID)
+            @Html.ValidationMessageFor(a => a.AdmissionSessionID)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.FirstName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.FirstName)
+            @Html.ValidationMessageFor(a => a.FirstName)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.LastName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.LastName)
+            @Html.ValidationMessageFor(a => a.LastName)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.AdmissionNo, new { maxlength = "50" })
+            @Html.LabelFor(a => a.AdmissionNo)
+            @Html.ValidationMessageFor(a => a.AdmissionNo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.PENNumber, new { maxlength = "11" })
+            @Html.LabelFor(a => a.PENNumber)
+            @Html.ValidationMessageFor(a => a.PENNumber)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.UDISENo, new { maxlength = "50" })
+            @Html.LabelFor(a => a.UDISENo)
+            @Html.ValidationMessageFor(a => a.UDISENo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.BoardRollNo, new { maxlength = "25" })
+            @Html.LabelFor(a => a.BoardRollNo)
+            @Html.ValidationMessageFor(a => a.BoardRollNo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.AdmissionDate, new { @class = "datepicker" })
+            @Html.LabelFor(a => a.AdmissionDate)
+            @Html.ValidationMessageFor(a => a.AdmissionDate)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.DateofBirth, new { @class = "datepicker" })
+            @Html.LabelFor(a => a.DateofBirth)
+            @Html.ValidationMessageFor(a => a.DateofBirth)
+        </div> 
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.MobileNo, new { onkeypress = "return isNumber(event,this);", maxlength = "10" })
+            @Html.LabelFor(a => a.MobileNo)
+            @Html.ValidationMessageFor(a => a.MobileNo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.EmailID, new { maxlength = "50" })
+            @Html.LabelFor(a => a.EmailID)
+            @Html.ValidationMessageFor(a => a.EmailID)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.AadharCardNo, new { onkeypress = "return isNumber(event,this);", maxlength = "12" })
+            @Html.LabelFor(a => a.AadharCardNo)
+            @Html.ValidationMessageFor(a => a.AadharCardNo)
+        </div>
+        <div class="input-field">
+            @Html.DropDownListFor(a => a.ClassSectionID, new SelectList(ViewBag.ClassSectionList, "ClassSectionID", "ClassSectionName", Model.ClassSectionID), "Select Class & Section")
+            @Html.LabelFor(a => a.ClassSectionID)
+            @Html.ValidationMessageFor(a => a.ClassSectionID)
+        </div>
+        <div class="input-field">
+            @Html.DropDownListFor(a => a.Gender, (new SelectList(new[]
+                                        {
+                                            new { ID = "", Name = "Select Gender" },
+                                            new { ID = "Male", Name = "Male" },
+                                            new { ID = "Female", Name = "Female" },
+                                        }, "ID", "Name", Model.Gender)) as SelectList)
+            @Html.LabelFor(a => a.Gender)
+            @Html.ValidationMessageFor(a => a.Gender)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.RollNo, new { onkeypress = "return isNumber(event,this);", maxlength = "10" })
+            @Html.LabelFor(a => a.RollNo)
+            @Html.ValidationMessageFor(a => a.RollNo)
+        </div>
+        <div class="input-field">
+            @Html.DropDownListFor(a => a.StudentCategoryID, new SelectList(ViewBag.CategoryList, "CategoryID", "CategoryName", Model.StudentCategoryID), "Select Category")
+            @Html.LabelFor(a => a.StudentCategoryID)
+            @Html.ValidationMessageFor(a => a.StudentCategoryID)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.FatherName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.FatherName)
+            @Html.ValidationMessageFor(a => a.FatherName)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.FatherMobileNo, new { onkeypress = "return isNumber(event,this);", maxlength = "10" })
+            @Html.LabelFor(a => a.FatherMobileNo)
+            @Html.ValidationMessageFor(a => a.FatherMobileNo)
+        </div> 
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.FatherAadharCardNo, new { onkeypress = "return isNumber(event,this);", maxlength = "12" })
+            @Html.LabelFor(a => a.FatherAadharCardNo)
+            @Html.ValidationMessageFor(a => a.FatherAadharCardNo)
+        </div>  
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.MotherName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.MotherName)
+            @Html.ValidationMessageFor(a => a.MotherName)
+        </div> 
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.MotherMobileNo, new { onkeypress = "return isNumber(event,this);", maxlength = "10" })
+            @Html.LabelFor(a => a.MotherMobileNo)
+            @Html.ValidationMessageFor(a => a.MotherMobileNo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.MotherAadharCardNo, new { onkeypress = "return isNumber(event,this);", maxlength = "12" })
+            @Html.LabelFor(a => a.MotherAadharCardNo)
+            @Html.ValidationMessageFor(a => a.MotherAadharCardNo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.GuardianName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.GuardianName)
+            @Html.ValidationMessageFor(a => a.GuardianName)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.GuardianMobileNo, new { onkeypress = "return isNumber(event,this);", maxlength = "10" })
+            @Html.LabelFor(a => a.GuardianMobileNo)
+            @Html.ValidationMessageFor(a => a.GuardianMobileNo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.EmergencyContactName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.EmergencyContactName)
+            @Html.ValidationMessageFor(a => a.EmergencyContactName)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.EmergencyContactNo, new { onkeypress = "return isNumber(event,this);", maxlength = "10" })
+            @Html.LabelFor(a => a.EmergencyContactNo)
+            @Html.ValidationMessageFor(a => a.EmergencyContactNo)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.Address1, new { maxlength = "250" })
+            @Html.LabelFor(a => a.Address1)
+            @Html.ValidationMessageFor(a => a.Address1)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.Address2, new { maxlength = "250" })
+            @Html.LabelFor(a => a.Address2)
+            @Html.ValidationMessageFor(a => a.Address2)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.CityName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.CityName)
+            @Html.ValidationMessageFor(a => a.CityName)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.StateName, new { maxlength = "50" })
+            @Html.LabelFor(a => a.StateName)
+            @Html.ValidationMessageFor(a => a.StateName)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.Pincode, new { onkeypress = "return isNumber(event,this);", maxlength = "6" })
+            @Html.LabelFor(a => a.Pincode)
+            @Html.ValidationMessageFor(a => a.Pincode)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.Nationality, new { maxlength = "20" })
+            @Html.LabelFor(a => a.Nationality)
+            @Html.ValidationMessageFor(a => a.Nationality)
+        </div> 
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.DateofCheckup, new { @class = "datepicker" })
+            @Html.LabelFor(a => a.DateofCheckup)
+            @Html.ValidationMessageFor(a => a.DateofCheckup)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.BloodGroup, new { maxlength = "5" })
+            @Html.LabelFor(a => a.BloodGroup)
+            @Html.ValidationMessageFor(a => a.BloodGroup)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.EyeSight, new { maxlength = "5" })
+            @Html.LabelFor(a => a.EyeSight)
+            @Html.ValidationMessageFor(a => a.EyeSight)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.Height, new { maxlength = "10" })
+            @Html.LabelFor(a => a.Height)
+            @Html.ValidationMessageFor(a => a.Height)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.Weight, new { maxlength = "10" })
+            @Html.LabelFor(a => a.Weight)
+            @Html.ValidationMessageFor(a => a.Weight)
+        </div>
+        <br />
+        <div class="">
+            @Html.CheckBoxFor(a => a.IsHandiCap)
+            @Html.LabelFor(a => a.IsHandiCap)
+            @Html.ValidationMessageFor(a => a.IsHandiCap)
+        </div> 
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.HandiCapDetails, new { maxlength = "250" })
+            @Html.LabelFor(a => a.HandiCapDetails)
+            @Html.ValidationMessageFor(a => a.HandiCapDetails)
+        </div>
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.NextDateofCheckup, new { @class = "datepicker" })
+            @Html.LabelFor(a => a.NextDateofCheckup)
+            @Html.ValidationMessageFor(a => a.NextDateofCheckup)
+        </div> 
+        <div class="input-field">
+            @Html.TextBoxFor(a => a.PrevFee, new { onkeypress = "return isNumber(event,this);", maxlength = "10" })
+            @Html.Label("PrevFee", "Prev Fee")
+            @Html.ValidationMessageFor(a => a.PrevFee)
+        </div>
+        <br />
+        @Html.LabelFor(a => a.flImageURL)
+        <div class="input-field">
+            <a class="img" href="#"><img id="displayImage" src="@Url.Content("~/images/user_128.png")" style="max-width:128px;" /></a>
+            @Html.HiddenFor(a => a.ImageURL)
+            @Html.HiddenFor(a => a.IsDelete, new { id = "klk" })
+            <input type="file" name="@Html.NameFor(x => x.flImageURL)" id="@Html.IdFor(x => x.flImageURL)" />
+            <span class="cust hide">
+                <a download="@Html.DisplayFor(x => x.ImageURL)" href="/resource/temp/" class='hide' id="filename" target="_blank">
+                    <span class='a dwn'>Download</span>
+                </a>&nbsp;|&nbsp;
+                <a class='hide' id="filename1">
+                    <span class='a dlt'>Delete</span>
+                </a>
+            </span>
+            <br />
+            <span style="font-style:italic;" id="Attachmentmessage">
+                Max. Size of attachment is 4 MB
+            </span>
+        </div>
+        <br />
+        @Html.LabelFor(a => a.flFatherImageURL)
+        <div class="input-field">
+            <a class="fatherimg" href="#"><img id="displayfatherImage" src="@Url.Content("~/images/user_128.png")" style="max-width:128px;" /></a>
+            @Html.HiddenFor(a => a.FatherImageURL)
+            @Html.HiddenFor(a => a.IsFatherDelete, new { id = "fklk" })
+            <input type="file" name="@Html.NameFor(x => x.flFatherImageURL)" id="@Html.IdFor(x => x.flFatherImageURL)" />
+            <span class="fcust hide">
+                <a download="@Html.DisplayFor(x => x.FatherImageURL)" href="/resource/temp/" class='hide' id="ffilename" target="_blank">
+                    <span class='a fdwn'>Download</span>
+                </a>&nbsp;|&nbsp;
+                <a class='hide' id="ffilename1">
+                    <span class='a fdlt'>Delete</span>
+                </a>
+            </span>
+            <br />
+            <span style="font-style:italic;" id="fAttachmentmessage">
+                Max. Size of attachment is 4 MB
+            </span>
+        </div>
+        <br />
+        @Html.LabelFor(a => a.flMotherImageURL)
+        <div class="input-field">
+            <a class="motherimg" href="#"><img id="displaymotherImage" src="@Url.Content("~/images/user_128.png")" style="max-width:128px;" /></a>
+            @Html.HiddenFor(a => a.MotherImageURL)
+            @Html.HiddenFor(a => a.IsMotherDelete, new { id = "mklk" })
+            <input type="file" name="@Html.NameFor(x => x.flMotherImageURL)" id="@Html.IdFor(x => x.flMotherImageURL)" />
+            <span class="mcust hide">
+                <a download="@Html.DisplayFor(x => x.MotherImageURL)" href="/resource/temp/" class='hide' id="mfilename" target="_blank">
+                    <span class='a mdwn'>Download</span>
+                </a>&nbsp;|&nbsp;
+                <a class='hide' id="mfilename1">
+                    <span class='a mdlt'>Delete</span>
+                </a>
+            </span>
+            <br />
+            <span style="font-style:italic;" id="mAttachmentmessage">
+                Max. Size of attachment is 4 MB
+            </span>
+        </div>
+        <br />
+        <div style="text-align: center;">
+            <input type="submit" class="createButton waves-light btn save" btnid="0" value="Save & Continue" />
+            <input type="submit" class="createButton waves-light btn save" btnid="1" value="Save & Close" />
+            @Html.Hidden("btnType", 0)
+        </div>
+    }
+    else
+    {
+        @Html.Partial("~/Views/Shared/_AddPremissionMessage.cshtml");
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("input[type='submit'].save").click(function () {
+            $("#btnType").val($(this).attr("btnid"));
+        });
+
+        if ($("#ImageURL").val() != "") $("#filename").show().attr("href", "/resource/temp/" + $("#ImageURL").val());
+        if ($("#ImageURL").val() != "") $("#filename1").show();
+        if ($("#ImageURL").val() != "") $(".cust").show();
+        $('#filename1').click(function () {
+            $(".cust").hide();
+            $("#klk").val("True");
+        });  
+        if ($("#ImageURL").val() == "") {
+            $("#displayImage").attr("src", "/images/user_128.png");
+        } else {
+            $("#displayImage").attr("src", "/resource/temp/" + $("#ImageURL").val());
+        };
+
+        if ($("#FatherImageURL").val() != "") $("#ffilename").show().attr("href", "/resource/temp/" + $("#FatherImageURL").val());
+        if ($("#FatherImageURL").val() != "") $("#ffilename1").show();
+        if ($("#FatherImageURL").val() != "") $(".fcust").show();
+        $('#ffilename1').click(function () {
+            $(".fcust").hide();
+            $("#fklk").val("True");
+        }); 
+        if ($("#FatherImageURL").val() == "") {
+            $("#displayfatherImage").attr("src", "/images/user_128.png");
+        } else {
+            $("#displayfatherImage").attr("src", "/resource/temp/" + $("#FatherImageURL").val());
+        };
+
+
+        if ($("#MotherImageURL").val() != "") $("#mfilename").show().attr("href", "/resource/temp/" + $("#MotherImageURL").val());
+        if ($("#MotherImageURL").val() != "") $("#mfilename1").show();
+        if ($("#MotherImageURL").val() != "") $(".mcust").show();
+        $('#mfilename1').click(function () {
+            $(".mcust").hide();
+            $("#mklk").val("True");
+        });
+        if ($("#MotherImageURL").val() == "") {
+            $("#displaymotherImage").attr("src", "/images/user_128.png");
+        } else {
+            $("#displaymotherImage").attr("src", "/resource/temp/" + $("#MotherImageURL").val());
+        };
+    });
+</script>
