@@ -1,0 +1,321 @@
+USE [Main_Project]
+GO 
+ALTER PROCEDURE [dbo].[ERP_AddUpdateDeleteStudent] 
+					@StudentID int=0,
+					@FirstName nvarchar(50)=NULL,
+					@LastName nvarchar(50)=NULL,
+					@AdmissionNo varchar(50)=NULL,
+					@DateofBirth date=null,
+					@MobileNo varchar(10)=NULL,
+					@EmailID varchar(50)='',
+					@AdmissionDate date=null,
+					@FatherName nvarchar(50)=null,
+					@MotherName nvarchar(50)=null,
+					@Gender varchar(10)=null,
+					@Nationality varchar(20)=null,
+					@CategoryID int=0,
+					@AdmissionSessionID int=0, 
+					@CreatedBy int=0, 
+					@ClassSectionID int=0,
+					@BoardRollNo varchar(25)=null,
+					@PrevFee decimal(10,2)=0.00,
+					@UDISENo varchar(50)=null,
+					@RollNo varchar(10)=null,
+					@IsDelete bit=0,
+					@SessionID int=0,
+					@SchoolID int=0,
+					@IsActive bit=0,
+					@FatherMobileNo varchar(10)=null,
+					@FatherAadharCardNo varchar(12)=null,
+					@MotherMobileNo varchar(10)=null,
+					@MotherAadharCardNo varchar(12)=null,
+					@AadharCardNo varchar(12)=null,
+					@GuardianName nvarchar(50)=null,
+					@GuardianMobileNo varchar(10)=null,
+					@EmergencyContactName nvarchar(50)=null,
+					@EmergencyContactNo varchar(10)=null,
+					@Address1 nvarchar(250)=null,
+					@Address2 nvarchar(250)=null,
+					@City nvarchar(50)=null,
+					@State nvarchar(50)=null,
+					@Pincode int=0,
+					@DateofCheckup date=null,
+					@BloodGroup varchar(5)=null,
+					@EyeSight varchar(5)=null,
+					@Height varchar(10)=null,
+					@Weight varchar(10)=null,
+					@IsHandiCap bit=0,
+					@HandiCapDetails nvarchar(250)=null,
+					@NextDateofCheckup date=null,
+					@ImageURL varchar(50)=null,
+					@FatherImageURL varchar(50)=null,
+					@MotherImageURL varchar(50)=null,
+					@Operation int=0,
+					@xml varchar(max)='',
+					@PENNumber varchar(11)=''
+
+AS
+BEGIN 
+	SET NOCOUNT ON;  
+	DECLARE @DateTime datetime=NULL; 
+	  
+	IF @Operation=1 BEGIN  
+			SELECT @DateTime=GETDATE();
+				IF (ISNULL(@AdmissionNo,'')='') BEGIN
+						SELECT @AdmissionNo= ISNUll(fr.Prefix,'') + '' + CAST(fr.LastFeeNo + 1 As varchar) + '' + ISNULL(fr.Sufix,'')
+						FROM dbo.FeeReceiptSetupTable fr WITH(NOLOCK)
+						INNER JOIN dbo.FeeReceiptClassSectionTable frcs WITH(NOLOCK) ON frcs.FeeReceiptSetupID=fr.FeeReceiptSetupID AND frcs.IsActive=1 AND frcs.ClassSectionID=@ClassSectionID
+						WHERE fr.ReceiptCategoryID=2 AND fr.SchoolID=@SchoolID 
+
+						UPDATE fr
+						SET fr.LastFeeNo = fr.LastFeeNo + 1 
+						FROM dbo.FeeReceiptSetupTable fr WITH(NOLOCK)
+						INNER JOIN dbo.FeeReceiptClassSectionTable frcs WITH(NOLOCK) ON frcs.FeeReceiptSetupID=fr.FeeReceiptSetupID AND frcs.IsActive=1 AND frcs.ClassSectionID=@ClassSectionID
+						WHERE fr.ReceiptCategoryID=2 AND fr.SchoolID=@SchoolID 
+				END  
+
+				INSERT INTO dbo.ERP_StudentTable (FirstName,LastName,AdmissionNo,DateofBirth,MobileNo,EmailID,AdmissionDate,FatherName,MotherName,Gender,Nationality,CategoryID,AdmissionSessionID,CreatedBy,CreatedDate,PENNumber) 
+				VALUES (@FirstName,ISNULL(@LastName,''),@AdmissionNo,@DateofBirth,@MobileNo,ISNULL(@EmailID,''),@AdmissionDate,@FatherName,@MotherName,@Gender,ISNULL(@Nationality,'INDIAN'),@CategoryID,@AdmissionSessionID,@CreatedBy,@DateTime,@PENNumber) 
+
+				DECLARE @handle INT 
+				DECLARE @PrepareXmlStatus INT
+
+				SELECT @StudentID=StudentID
+				FROM dbo.ERP_StudentTable WITH(NOLOCK)
+				WHERE FirstName = @FirstName AND AdmissionNo=@AdmissionNo 
+				AND CreatedDate=@DateTime AND CreatedBy=@CreatedBy;
+
+				INSERT INTO dbo.ERP_StudentSessionTable (StudentID,UDISENo,RollNo,PrevFee,BoardRollNo,ClassSectionID,SessionID,SchoolID,IsActive,IsDelete)
+				VALUES (@StudentID,ISNULL(@UDISENo,''),ISNULL(@RollNo,''),@PrevFee,ISNULL(@BoardRollNo,''),@ClassSectionID,@SessionID,@SchoolID,1,0)
+
+				INSERT INTO dbo.ERP_StudentContactTable (StudentID,Address1,Address2,City,State,Pincode)
+				VALUES (@StudentID,ISNULL(@Address1,''),ISNULL(@Address2,''),ISNULL(@City,''),ISNULL(@State,''),@Pincode) 
+				
+				INSERT INTO dbo.ERP_StudentOtherInformationTable (StudentID,FatherMobileNo,FatherAadharCardNo,MotherMobileNo,MotherAadharCardNo,AadharCardNo,GuardianName,GuardianMobileNo,EmergencyContactName,EmergencyContactNo)
+				VALUES (@StudentID,ISNULL(@FatherMobileNo,''),ISNULL(@FatherAadharCardNo,''),ISNULL(@MotherMobileNo,''),ISNULL(@MotherAadharCardNo,''),ISNULL(@AadharCardNo,''),ISNULL(@GuardianName,''),ISNULL(@GuardianMobileNo,''),ISNULL(@EmergencyContactName,''),ISNULL(@EmergencyContactNo,''))
+				
+				INSERT INTO dbo.ERP_StudentHealthInfoTable(StudentID,DateofCheckup,BloodGroup,EyeSight,Height,Weight,IsHandiCap,HandiCapDetails,NextDateofCheckup)
+				VALUES(@StudentID,ISNULL(@DateofCheckup,NULL),ISNULL(@BloodGroup,''),ISNULL(@EyeSight,''),ISNULL(@Height,''),ISNULL(@Weight,''),@IsHandiCap,ISNULL(@HandiCapDetails,''),ISNULL(@NextDateofCheckup,NULL))
+
+				INSERT INTO dbo.ERP_StudentImageTable(StudentID,ImageURL,FatherImageURL,MotherImageURL)
+				VALUES(@StudentID,ISNULL(@ImageURL,''),ISNULL(@FatherImageURL,''),ISNULL(@MotherImageURL,''))  
+
+				exec ERP_AddUpdateDeleteLogin @UserID=@StudentID,@UserName=@AdmissionNo,@Password=@AdmissionNo,@CreatedID=@CreatedBy,@Operation=1,@UserTypeID=3;
+
+				exec Main_ChangeLog_Project.dbo.ChangeLog_AddUpdateDeleteStudent @StudentID=@StudentID,@FirstName=@FirstName,@LastName=@LastName,@AdmissionNo=@AdmissionNo,@DateofBirth=@DateofBirth
+																				,@MobileNo=@MobileNo,@EmailID=@EmailID,@AdmissionDate=@AdmissionDate,@FatherName=@FatherName,@MotherName=@MotherName
+																				,@Gender=@Gender,@Nationality=@Nationality,@CategoryID=@CategoryID,@AdmissionSessionID=@AdmissionSessionID,@CreatedBy=@CreatedBy
+																				,@PENNumber=@PENNumber,@RollNo=@RollNo,@UDISENo=@UDISENo,@PrevFee=@PrevFee,@BoardRollNo=@BoardRollNo,@ClassSectionID=@ClassSectionID
+																				,@ConcessionID=0,@Address1=@Address1,@Address2=@Address2,@City=@City,@State=@State,@Pincode=@Pincode,@DateofCheckup=@DateofCheckup,@BloodGroup=@BloodGroup
+																				,@EyeSight=@EyeSight,@Height=@Height,@Weight=@Weight,@IsHandiCap=@IsHandiCap,@HandiCapDetails=@HandiCapDetails,@NextDateofCheckup=@NextDateofCheckup,@FatherMobileNo=@FatherMobileNo
+																				,@FatherAadharCardNo=@FatherAadharCardNo,@MotherMobileNo=@MotherMobileNo,@MotherAadharCardNo=@MotherAadharCardNo,@AadharCardNo=@AadharCardNo,@GuardianName=@GuardianName,@GuardianMobileNo=@GuardianMobileNo
+																				,@EmergencyContactName=@EmergencyContactName,@EmergencyContactNo=@EmergencyContactNo,@ImageURL=@ImageURL,@FatherImageURL=@FatherImageURL,@MotherImageURL=@MotherImageURL,@SessionID=@SessionID
+																				,@SchoolID=@SchoolID,@IsActive=1,@IsDelete=0,@Datetime=@DateTime,@Operation=@Operation;
+
+	  END  
+	  IF @Operation=2 BEGIN
+			SELECT @DateTime=GETDATE();
+			
+			UPDATE dbo.ERP_StudentTable
+			SET FirstName=@FirstName,
+				LastName=ISNULL(@LastName,''),				
+				DateofBirth=@DateofBirth,
+				MobileNo=@MobileNo,
+				EmailID=ISNULL(@EmailID,''),
+				AdmissionDate=@AdmissionDate,
+				FatherName=@FatherName,
+				MotherName=@MotherName,
+				Gender=@Gender,
+				Nationality=ISNULL(@Nationality,'INDIAN'),
+				CategoryID=@CategoryID,
+				AdmissionSessionID=@AdmissionSessionID,
+				ModifiedBy=@CreatedBy,
+				ModifiedDate=@DateTime,
+				PENNumber=@PENNumber
+			WHERE StudentID=@StudentID
+
+			UPDATE dbo.ERP_StudentSessionTable
+			SET	
+				UDISENo=ISNULL(@UDISENo,'')
+			   ,RollNo=ISNULL(@RollNo,'') 
+			   ,BoardRollNo=ISNULL(@BoardRollNo,'')
+			   ,ClassSectionID=@ClassSectionID 
+			   ,PrevFee=@PrevFee
+			WHERE StudentID=@StudentID 
+			
+			UPDATE dbo.ERP_StudentContactTable
+			SET	
+				Address1=ISNULL(@Address1,'')
+			   ,Address2=ISNULL(@Address2,'') 
+			   ,City=ISNULL(@City,'')
+			   ,State=ISNULL(@State,'')
+			   ,Pincode=@Pincode
+			WHERE StudentID=@StudentID 
+			
+			UPDATE dbo.ERP_StudentOtherInformationTable
+			SET	
+				FatherMobileNo=ISNULL(@FatherMobileNo,'')
+			   ,FatherAadharCardNo=ISNULL(@FatherAadharCardNo,'')
+			   ,MotherMobileNo=ISNULL(@MotherMobileNo,'')
+			   ,MotherAadharCardNo=ISNULL(@MotherAadharCardNo,'')
+			   ,AadharCardNo=ISNULL(@AadharCardNo,'')
+			   ,GuardianName=ISNULL(@GuardianName,'')
+			   ,GuardianMobileNo=ISNULL(@GuardianMobileNo,'')
+			   ,EmergencyContactName=ISNULL(@EmergencyContactName,'')
+			   ,EmergencyContactNo=ISNULL(@EmergencyContactNo,'')
+			WHERE StudentID=@StudentID 
+
+			UPDATE dbo.ERP_StudentHealthInfoTable
+			SET	
+				DateofCheckup=ISNULL(@DateofCheckup,null)
+			   ,BloodGroup=ISNULL(@BloodGroup,'')
+			   ,EyeSight=ISNULL(@EyeSight,'')
+			   ,Height=ISNULL(@Height,'')
+			   ,Weight=ISNULL(@Weight,'')
+			   ,IsHandiCap=@IsHandiCap
+			   ,HandiCapDetails=ISNULL(@HandiCapDetails,'')
+			   ,NextDateofCheckup=ISNULL(@NextDateofCheckup,NULL) 
+			WHERE StudentID=@StudentID
+			 
+			UPDATE dbo.ERP_StudentImageTable
+			SET	
+				ImageURL=ISNULL(@ImageURL,'')
+			   ,FatherImageURL=ISNULL(@FatherImageURL,'') 
+			   ,MotherImageURL=ISNULL(@MotherImageURL,'') 
+			WHERE StudentID=@StudentID 
+			
+			exec Main_ChangeLog_Project.dbo.ChangeLog_AddUpdateDeleteStudent @StudentID=@StudentID,@FirstName=@FirstName,@LastName=@LastName,@AdmissionNo=@AdmissionNo,@DateofBirth=@DateofBirth
+																				,@MobileNo=@MobileNo,@EmailID=@EmailID,@AdmissionDate=@AdmissionDate,@FatherName=@FatherName,@MotherName=@MotherName
+																				,@Gender=@Gender,@Nationality=@Nationality,@CategoryID=@CategoryID,@AdmissionSessionID=@AdmissionSessionID,@CreatedBy=@CreatedBy
+																				,@PENNumber=@PENNumber,@RollNo=@RollNo,@UDISENo=@UDISENo,@PrevFee=@PrevFee,@BoardRollNo=@BoardRollNo,@ClassSectionID=@ClassSectionID
+																				,@ConcessionID=0,@Address1=@Address1,@Address2=@Address2,@City=@City,@State=@State,@Pincode=@Pincode,@DateofCheckup=@DateofCheckup,@BloodGroup=@BloodGroup
+																				,@EyeSight=@EyeSight,@Height=@Height,@Weight=@Weight,@IsHandiCap=@IsHandiCap,@HandiCapDetails=@HandiCapDetails,@NextDateofCheckup=@NextDateofCheckup,@FatherMobileNo=@FatherMobileNo
+																				,@FatherAadharCardNo=@FatherAadharCardNo,@MotherMobileNo=@MotherMobileNo,@MotherAadharCardNo=@MotherAadharCardNo,@AadharCardNo=@AadharCardNo,@GuardianName=@GuardianName,@GuardianMobileNo=@GuardianMobileNo
+																				,@EmergencyContactName=@EmergencyContactName,@EmergencyContactNo=@EmergencyContactNo,@ImageURL=@ImageURL,@FatherImageURL=@FatherImageURL,@MotherImageURL=@MotherImageURL,@SessionID=@SessionID
+																				,@SchoolID=@SchoolID,@IsActive=1,@IsDelete=0,@Datetime=@DateTime,@Operation=@Operation;
+	  END 
+	  
+	IF @Operation=3 BEGIN 
+		SELECT @DateTime=GETDATE();
+		IF(ISNULL(@xml,'')='') BEGIN
+				UPDATE dbo.ERP_StudentSessionTable
+				SET IsDelete=@IsDelete
+				WHERE StudentID=@StudentID 
+				AND SessionID=@SessionID
+
+				UPDATE dbo.ERP_StudentTable
+				SET ModifiedDate=@DateTime
+				   ,ModifiedBy=@CreatedBy
+				WHERE StudentID=@StudentID
+
+				UPDATE lt
+				SET lt.IsDelete=@IsDelete
+				FROM dbo.ERP_LoginTable lt WITH(NOLOCK) 
+				INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.StudentID=lt.UserID AND sst.SessionID=@SessionID AND sst.SchoolID=@schoolID
+				WHERE lt.UserID=@StudentID AND lt.UserTypeID=3; 
+
+				exec Main_ChangeLog_Project.dbo.ChangeLog_AddUpdateDeleteStudent @StudentID=@StudentID,@SessionID=@SessionID,@SchoolID=@SchoolID,@CreatedBy=@CreatedBy,@DateTime=@DateTime,@IsActive=1,@IsDelete=@IsDelete,@Operation=@Operation;
+		END 
+		ELSE BEGIN	
+				DECLARE @StudentForDelete TABLE (StudentID int,ISelect bit)
+
+				EXEC @PrepareXmlStatus= sp_xml_preparedocument @handle OUTPUT, @XML 
+					INSERT INTO @StudentForDelete
+					SELECT   
+						 StudentID
+						,ISelect 
+					FROM OPENXML(@handle, '/ERP_StudentTable/ERP_StudentTable', 2)  
+					WITH (
+					StudentID int,
+					ISelect bit 
+				)	  
+				EXEC sp_xml_removedocument @handle 
+
+				UPDATE a
+				SET a.IsDelete=t.ISelect
+				FROM dbo.ERP_StudentSessionTable a 
+				INNER JOIN @StudentForDelete t ON t.StudentID=a.StudentID   
+				WHERE a.SessionID=@SessionID AND a.SchoolID=@SchoolID
+			
+				UPDATE lt
+				SET lt.IsDelete=t.ISelect
+				FROM dbo.ERP_LoginTable lt
+				INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.StudentID=lt.UserID AND sst.SessionID=@SessionID AND sst.SchoolID=@schoolID
+				INNER JOIN @StudentForDelete t ON t.StudentID=sst.StudentID  
+				WHERE UserTypeID=3;
+
+				UPDATE st
+				SET st.ModifiedDate=@DateTime,
+					st.ModifiedBy=@CreatedBy 
+				FROM dbo.ERP_StudentTable st WITH(NOLOCK)
+				INNER JOIN @StudentForDelete t ON t.StudentID=st.StudentID 
+
+				INSERT INTO Main_ChangeLog_Project.dbo.ChangeLog_ERP_StudentTable(StudentID,CreatedBy,CreatedDate,SessionID,SchoolID,IsActive,IsDelete)
+				SELECT StudentID,@CreatedBy,@Datetime,@SessionID,@SchoolID,1,ISelect
+				FROM @StudentForDelete
+		END 
+	END 
+	
+	IF @Operation=4 BEGIN 
+		SELECT @DateTime=GETDATE();
+		IF(ISNULL(@xml,'')='') BEGIN
+				UPDATE dbo.ERP_StudentSessionTable
+				SET IsActive=@IsActive
+				WHERE StudentID=@StudentID 
+				AND SessionID=@SessionID
+
+				UPDATE dbo.ERP_StudentTable
+				SET ModifiedDate=@DateTime
+				   ,ModifiedBy=@CreatedBy
+				WHERE StudentID=@StudentID
+
+				UPDATE lt
+				SET lt.IsActive=@IsActive
+				FROM dbo.ERP_LoginTable lt WITH(NOLOCK) 
+				INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.StudentID=lt.UserID AND sst.SessionID=@SessionID AND sst.SchoolID=@schoolID
+				WHERE lt.UserID=@StudentID AND lt.UserTypeID=3; 
+
+				exec Main_ChangeLog_Project.dbo.ChangeLog_AddUpdateDeleteStudent @StudentID=@StudentID,@SessionID=@SessionID,@SchoolID=@SchoolID,@CreatedBy=@CreatedBy,@DateTime=@DateTime,@IsActive=@IsActive,@Operation=@Operation;
+		END 
+		ELSE BEGIN	
+				DECLARE @StudentForActive TABLE (StudentID int,ISelect bit)
+
+				EXEC @PrepareXmlStatus= sp_xml_preparedocument @handle OUTPUT, @XML 
+					INSERT INTO @StudentForDelete
+					SELECT   
+						 StudentID
+						,ISelect 
+					FROM OPENXML(@handle, '/ERP_StudentTable/ERP_StudentTable', 2)  
+					WITH (
+					StudentID int,
+					ISelect bit 
+				)	  
+				EXEC sp_xml_removedocument @handle 
+
+				UPDATE a
+				SET a.IsActive=t.ISelect
+				FROM dbo.ERP_StudentSessionTable a 
+				INNER JOIN @StudentForActive t ON t.StudentID=a.StudentID   
+				WHERE a.SessionID=@SessionID AND a.SchoolID=@SchoolID
+			
+				UPDATE lt
+				SET lt.IsActive=t.ISelect
+				FROM dbo.ERP_LoginTable lt
+				INNER JOIN dbo.ERP_StudentSessionTable sst WITH(NOLOCK) ON sst.StudentID=lt.UserID AND sst.SessionID=@SessionID AND sst.SchoolID=@schoolID
+				INNER JOIN @StudentForActive t ON t.StudentID=sst.StudentID  
+				WHERE UserTypeID=3;
+
+				UPDATE st
+				SET st.ModifiedDate=@DateTime,
+					st.ModifiedBy=@CreatedBy 
+				FROM dbo.ERP_StudentTable st WITH(NOLOCK)
+				INNER JOIN @StudentForActive t ON t.StudentID=st.StudentID 
+				 
+				INSERT INTO Main_ChangeLog_Project.dbo.ChangeLog_ERP_StudentTable(StudentID,CreatedBy,CreatedDate,SessionID,SchoolID,IsActive,IsDelete)
+				SELECT StudentID,@CreatedBy,@Datetime,@SessionID,@SchoolID,ISelect,0
+				FROM @StudentForActive
+		END
+	END 
+	 SELECT @Operation;   
+	 exec ERP_spGetClassSectionList 0,0,1,1,1,10,@CreatedBy,@SchoolID,@SessionID;
+ END 
